@@ -1,7 +1,39 @@
 "use client";
 import { usePrivy } from '@privy-io/react-auth';
+import { useWallets } from "@privy-io/react-auth";
+import { Button } from '@/components/ui/button';
+import { http, createWalletClient, createPublicClient } from 'viem';
+import CryptoJS from "crypto-js";
+import { useIpAsset } from '@story-protocol/react-sdk';
+
+
 
 export default function Home() {
+  const wallets = useWallets();
+
+  const { register } = useIpAsset();
+
+  async function registerIp() {
+    const res = await fetch('/api/mint')
+    const { tokenId } = await res.json();
+
+    const ipfsUri = "https://ipfs.io/ipfs/QmPuVyYjT1ZEPf4ACka3og3XtYmSpnHJAWS8DsmHx2PUqG";
+    const response = await register({
+      // @ts-ignore
+      nftContract: wallets[0].address, // your NFT contract address
+      tokenId, // your NFT token ID
+      ipMetadata: {
+        ipMetadataURI: ipfsUri,
+        ipMetadataHash: `0xsomehash`,
+        nftMetadataHash: `0xsomehash`,
+        nftMetadataURI: ipfsUri,
+      },
+      txOptions: {
+        waitForTransaction: true
+      }
+    });
+    console.log(response);
+  }
   const { login, logout, user } = usePrivy();
 
   return (
@@ -25,6 +57,7 @@ export default function Home() {
       </header>
 
       <main className="text-center">
+        <Button onClick={registerIp}>Test Register IP</Button>
         <h1 className="text-6xl font-bold text-gray-800 mb-8">storybook.</h1>
         {user && (
           <p className="mb-8 text-gray-600">

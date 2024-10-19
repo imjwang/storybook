@@ -7,7 +7,9 @@ import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 import { PropsWithChildren } from "react";
 import { StoryProvider } from "@story-protocol/react-sdk";
 import { createWalletClient, type Chain } from "viem";
-import { useWalletClient } from "wagmi";
+// import { useWalletClient } from "wagmi";
+import { useWallets } from "@privy-io/react-auth";
+
 import { mainnet } from 'viem/chains';
 
 
@@ -87,7 +89,8 @@ export default function Web3Providers({ children }: PropsWithChildren) {
 // we use this component to pass in our 
 // wallet from wagmi
 function StoryProviderWrapper({ children }: PropsWithChildren) {
-  const { data: wallet } = useWalletClient();
+  // const { data: wallet } = useWalletClient();
+  const { ready, wallets } = useWallets();
 
   const dummyWallet = createWalletClient({
     chain: iliad,
@@ -99,7 +102,7 @@ function StoryProviderWrapper({ children }: PropsWithChildren) {
       config={{
         chainId: "iliad",
         transport: http(process.env.NEXT_PUBLIC_RPC_PROVIDER_URL),
-        wallet: wallet || dummyWallet,
+        wallet: wallets[0] || dummyWallet,
       }}
     >
       {children}
