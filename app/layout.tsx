@@ -1,3 +1,4 @@
+
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
@@ -5,6 +6,7 @@ import HeaderAuth from "@/components/header-auth";
 import Web3Providers from "./providers/web3";
 // import { DynamicContextProvider } from '@dynamic-labs/sdk-react-core';
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
+import PrivyProviderWrapper from "./providers/privyprovider";
 
 
 
@@ -34,10 +36,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Web3Providers>
-          <HeaderAuth />
-          {children}
-        </Web3Providers>
+        <PrivyProviderWrapper>
+          <Web3Providers>
+            {children}
+          </Web3Providers>
+        </PrivyProviderWrapper>
       </body>
     </html >
   );
