@@ -136,7 +136,7 @@ function StoryProvider({ children }: PropsWithChildren) {
     if (!window.ethereum) return "";
     console.log("Minting a new NFT...");
     const walletClient = createWalletClient({
-      account: wallet?.address as Address,
+      account: to,
       chain: iliad,
       transport: http("https://testnet.storyrpc.io"),
     });
