@@ -1,7 +1,6 @@
 import { http, createWalletClient, createPublicClient } from 'viem';
 import { sepolia } from 'viem/chains';
 import { privateKeyToAccount, Address, Account } from 'viem/accounts';
-import { StoryClient, StoryConfig } from '@story-protocol/core-sdk'
 import { NextRequest, NextResponse } from 'next/server';
 
 
@@ -15,12 +14,6 @@ const mintContractAbi = {
 
 const privateKey: Address = `0x${process.env.WALLET_PRIVATE_KEY}`;
 const account: Account = privateKeyToAccount(privateKey);
-const config: StoryConfig = {
-  account,
-  transport: http('https://rpc.ankr.com/eth_sepolia')
-}
-const client = StoryClient.newClient(config);
-
 const walletClient = createWalletClient({
   account,
   chain: sepolia,
@@ -31,7 +24,7 @@ const publicClient = createPublicClient({
   transport: http('https://rpc.ankr.com/eth_sepolia')
 })
 
-async function mintNFT(address: Address, accountAddress: any): Promise<string> {
+async function mintNFT(address: Address, accountAddress: string): Promise<string> {
   const { request } = await publicClient.simulateContract({
     address: address,
     functionName: 'mint',

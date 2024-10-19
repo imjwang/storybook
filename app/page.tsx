@@ -2,8 +2,6 @@
 import { usePrivy } from '@privy-io/react-auth';
 import { useWallets } from "@privy-io/react-auth";
 import { Button } from '@/components/ui/button';
-import { http, createWalletClient, createPublicClient } from 'viem';
-import CryptoJS from "crypto-js";
 import { useIpAsset } from '@story-protocol/react-sdk';
 
 
@@ -19,7 +17,7 @@ export default function Home() {
 
     const ipfsUri = "https://ipfs.io/ipfs/QmPuVyYjT1ZEPf4ACka3og3XtYmSpnHJAWS8DsmHx2PUqG";
     const response = await register({
-      // @ts-ignore
+      // @ts-expect-error some type error
       nftContract: wallets[0].address, // your NFT contract address
       tokenId, // your NFT token ID
       ipMetadata: {

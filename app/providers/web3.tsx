@@ -7,11 +7,7 @@ import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 import { PropsWithChildren } from "react";
 import { StoryProvider } from "@story-protocol/react-sdk";
 import { createWalletClient, type Chain } from "viem";
-// import { useWalletClient } from "wagmi";
 import { useWallets } from "@privy-io/react-auth";
-
-import { mainnet } from 'viem/chains';
-
 
 
 export const iliad = {
@@ -67,7 +63,7 @@ export default function Web3Providers({ children }: PropsWithChildren) {
         appName: "Story Book",
         // Find your environment id at https://app.dynamic.xyz/dashboard/developer
         environmentId: process.env.NEXT_PUBLIC_DYNAMIC_ENV_ID as string,
-        // @ts-ignore
+        // @ts-expect-error some type error
         walletConnectors: [EthereumWalletConnectors],
         overrides: { evmNetworks },
         networkValidationMode: "always",
@@ -90,7 +86,7 @@ export default function Web3Providers({ children }: PropsWithChildren) {
 // wallet from wagmi
 function StoryProviderWrapper({ children }: PropsWithChildren) {
   // const { data: wallet } = useWalletClient();
-  const { ready, wallets } = useWallets();
+  const { wallets } = useWallets();
 
   const dummyWallet = createWalletClient({
     chain: iliad,
@@ -102,6 +98,7 @@ function StoryProviderWrapper({ children }: PropsWithChildren) {
       config={{
         chainId: "iliad",
         transport: http(process.env.NEXT_PUBLIC_RPC_PROVIDER_URL),
+        // @ts-expect-error some type error
         wallet: wallets[0] || dummyWallet,
       }}
     >
