@@ -5,14 +5,14 @@ import { createClient } from "@/lib/supabase/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-export const signUpAction = async (formData: FormData) => {
+export const signUpAction = async (formData: FormData): Promise<void> => {
   const email = formData.get("email")?.toString();
   const password = formData.get("password")?.toString();
   const supabase = createClient();
   const origin = headers().get("origin");
 
   if (!email || !password) {
-    return { error: "Email and password are required" };
+    throw new Error("Email and password are required");
   }
 
   const { error } = await supabase.auth.signUp({
@@ -25,9 +25,9 @@ export const signUpAction = async (formData: FormData) => {
 
   if (error) {
     console.error(error.code + " " + error.message);
-    return encodedRedirect("error", "/sign-up", error.message);
+    throw encodedRedirect("error", "/sign-up", error.message);
   } else {
-    return encodedRedirect(
+    throw encodedRedirect(
       "success",
       "/sign-up",
       "Thanks for signing up! Please check your email for a verification link.",
