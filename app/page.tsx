@@ -1,5 +1,7 @@
+import { DynamicWidget } from '@dynamic-labs/sdk-react-core';
 export default function Home() {
   return <div className="flex flex-col items-center justify-center h-screen">
+    <DynamicWidget />
     <h1 className="text-4xl font-bold">storybook.</h1>
     <div className="mt-8">
       <button className="w-32 h-32 bg-gray-200 hover:bg-gray-300 flex items-center justify-center rounded-lg shadow-md transition duration-300 ease-in-out">
@@ -10,4 +12,3 @@ export default function Home() {
       <p className="mt-2 text-center text-gray-600 font-bold">create new book.</p>
     </div>
   </div>;
-}
