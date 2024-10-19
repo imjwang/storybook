@@ -146,7 +146,7 @@ function StoryProvider({ children }: PropsWithChildren) {
     });
 
     const { request } = await publicClient.simulateContract({
-      address: to,
+      address: "0xd2a4a4Cb40357773b658BECc66A6c165FD9Fc485",
       functionName: "mintNFT",
       args: [to, uri],
       abi: defaultNftContractAbi,
