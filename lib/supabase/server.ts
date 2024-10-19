@@ -18,6 +18,7 @@ export const createClient = () => {
               cookieStore.set(name, value, options);
             });
           } catch (error) {
+            console.log('Error setting cookies:', error);
             // The `set` method was called from a Server Component.
             // This can be ignored if you have middleware refreshing
             // user sessions.
