@@ -2,37 +2,43 @@
 import { usePrivy } from '@privy-io/react-auth';
 import { useWallets } from "@privy-io/react-auth";
 import { Button } from '@/components/ui/button';
-import { useIpAsset } from '@story-protocol/react-sdk';
-
+// import { useIpAsset } from '@story-protocol/react-sdk';
+import { useStory } from '@/app/providers/web3';
+import { Address } from 'viem';
 
 
 export default function Home() {
-  const wallets = useWallets();
+  const { wallets } = useWallets();
+  // const { register } = useIpAsset();
+  // const wallet = wallets[0];
+  const { login, logout, user } = usePrivy();
+  const { mintNFT } = useStory();
 
-  const { register } = useIpAsset();
 
   async function registerIp() {
-    const res = await fetch('/api/mint')
-    const { tokenId } = await res.json();
+    // const res = await fetch('/api/mint')
+    // const { tokenId } = await res.json();
+    const tokenId = await mintNFT(wallets[0].address as Address, "https://ipfs.io/ipfs/QmPuVyYjT1ZEPf4ACka3og3XtYmSpnHJAWS8DsmHx2PUqG");
 
-    const ipfsUri = "https://ipfs.io/ipfs/QmPuVyYjT1ZEPf4ACka3og3XtYmSpnHJAWS8DsmHx2PUqG";
-    const response = await register({
-      // @ts-expect-error some type error
-      nftContract: wallets[0].address, // your NFT contract address
-      tokenId, // your NFT token ID
-      ipMetadata: {
-        ipMetadataURI: ipfsUri,
-        ipMetadataHash: `0xsomehash`,
-        nftMetadataHash: `0xsomehash`,
-        nftMetadataURI: ipfsUri,
-      },
-      txOptions: {
-        waitForTransaction: true
-      }
-    });
-    console.log(response);
+    // const ipfsUri = "https://ipfs.io/ipfs/QmPuVyYjT1ZEPf4ACka3og3XtYmSpnHJAWS8DsmHx2PUqG";
+    // const response = await register({
+    //   // @ts-expect-error some type error
+    //   nftContract: wallets[0].address, // your NFT contract address
+    //   tokenId, // your NFT token ID
+    //   ipMetadata: {
+    //     ipMetadataURI: ipfsUri,
+    //     ipMetadataHash: `0xsomehash`,
+    //     nftMetadataHash: `0xsomehash`,
+    //     nftMetadataURI: ipfsUri,
+    //   },
+    //   txOptions: {
+    //     waitForTransaction: true
+    //   }
+    // });
+    console.log(tokenId);
   }
-  const { login, logout, user } = usePrivy();
+
+
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-blue-50 to-white">
