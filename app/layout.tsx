@@ -2,6 +2,11 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import HeaderAuth from "@/components/header-auth";
+import Web3Providers from "./providers/web3";
+// import { DynamicContextProvider } from '@dynamic-labs/sdk-react-core';
+import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
+
+
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -29,9 +34,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <HeaderAuth />
-        {children}
+        <Web3Providers>
+          <HeaderAuth />
+          {children}
+        </Web3Providers>
       </body>
-    </html>
+    </html >
   );
 }
