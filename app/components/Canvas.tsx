@@ -10,11 +10,12 @@ interface CanvasProps {
 export default function Canvas({ children, onDoubleClick }: CanvasProps) {
   return (
     <div 
-      className="w-full h-full relative flex flex-col overflow-hidden"
+      className="w-full h-full relative flex flex-col overflow-auto"
       style={{
         background: '#fbfaee',
         boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)',
         backdropFilter: 'blur(5px)',
+        minHeight: '100vh',
       }}
       onDoubleClick={onDoubleClick}
     >
@@ -28,9 +29,15 @@ export default function Canvas({ children, onDoubleClick }: CanvasProps) {
           backgroundSize: '40px 40px, 90px 90px',
           backgroundPosition: '0 0, 15px 15px',
           opacity: 0.1,
+          height: '100%',
+          width: '100%',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          zIndex: -1,
         }}
       />
-      <div className="relative z-10 flex-grow">
+      <div className="relative z-10 flex-grow min-h-full min-w-full">
         {children}
       </div>
     </div>

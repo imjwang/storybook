@@ -22,12 +22,19 @@ interface Book {
 }
 
 export default function Home() {
-  const { mintAndRegisterNFT, registerLicense, mintLicense, ipId, termsId } = useStory();
+  const { mintAndRegisterNFT, registerLicense, mintLicense } = useStory();
   const { data: wallet, isLoading } = useWalletClient();
   const router = useRouter();
 
-  const ipIpfsHash = "QmRANDOMHASH123456789abcdefghijklmnopqrstuvwxyz"
-  const uri = `https://ipfs.io/ipfs/${ipIpfsHash}`
+  const handlePublish = async () => {
+    const ipId = await mintAndRegisterNFT(wallet?.account.address as Address, uri) // uri should come from the browser index
+    const res = await registerLicense(ipId as `0x${string}`)
+    return res?.licenseTermsId // use to create a json
+  }
+
+  const uri = "1" // this needs to be id of note
+  // const ipIpfsHash = "QmRANDOMHASH123456789abcdefghijklmnopqrstuvwxyz"
+  // const uri = `https://ipfs.io/ipfs/${ipIpfsHash}`
 
   return (
     <div className="min-h-screen bg-[#fbfaee]">
@@ -44,24 +51,6 @@ export default function Home() {
               Welcome, {wallet.account.address.slice(0, 6)}...{wallet.account.address.slice(-4)}
             </p>
             <div className="grid grid-cols-2 gap-6 mb-12">
-              <Button 
-                onClick={() => mintAndRegisterNFT(wallet?.account.address as Address, uri)}
-                className="bg-[#6e2daa] hover:bg-[#933dc9] text-[#fbfaee] font-medium py-4 px-8 rounded-full transition duration-300 ease-in-out shadow-lg hover:shadow-xl transform hover:-translate-y-1 active:translate-y-0 active:shadow-md"
-              >
-                Mint Token
-              </Button>
-              <Button 
-                onClick={() => registerLicense(ipId as `0x${string}`)}
-                className="bg-[#6e2daa] hover:bg-[#933dc9] text-[#fbfaee] font-medium py-4 px-8 rounded-full transition duration-300 ease-in-out shadow-lg hover:shadow-xl transform hover:-translate-y-1 active:translate-y-0 active:shadow-md"
-              >
-                Register PIL
-              </Button>
-              <Button 
-                onClick={() => mintLicense(ipId as `0x${string}`, termsId as bigint)}
-                className="col-span-2 bg-[#53118f] hover:bg-[#6e2daa] text-[#fbfaee] font-medium py-4 px-8 rounded-full transition duration-300 ease-in-out shadow-lg hover:shadow-xl transform hover:-translate-y-1 active:translate-y-0 active:shadow-md"
-              >
-                Mint License
-              </Button>
             </div>
             {isLoading ? (
               <p className="text-center text-[#53118f]">Loading books...</p>

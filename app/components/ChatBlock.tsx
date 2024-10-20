@@ -24,9 +24,10 @@ interface ChatBlockProps {
   block: Block;
   setBlocks: React.Dispatch<React.SetStateAction<Block[]>>;
   onMessageComplete: () => void;
+  blocks: Block[];
 }
 
-export default function ChatBlock({ block, setBlocks, onMessageComplete }: ChatBlockProps) {
+export default function ChatBlock({ blocks, block, setBlocks, onMessageComplete }: ChatBlockProps) {
   const [message, setMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -52,8 +53,8 @@ export default function ChatBlock({ block, setBlocks, onMessageComplete }: ChatB
 
     setIsLoading(true)
     try {
-      const isTableRequest = message.toLowerCase().includes('table') || 
-                             message.toLowerCase().includes('tabular data')
+      const isTableRequest = message.toLowerCase().includes('table') ||
+        message.toLowerCase().includes('tabular data')
 
       let promptMessage = message
       if (isTableRequest) {
@@ -72,11 +73,11 @@ export default function ChatBlock({ block, setBlocks, onMessageComplete }: ChatB
       }
 
       const newUserMessage: Response = { role: 'user' as const, content: promptMessage };
-      
-      setBlocks(prevBlocks => 
-        prevBlocks.map(b => 
-          b.id === block.id 
-            ? {...b, responses: [...b.responses, { role: 'user' as const, content: message }]} 
+
+      setBlocks(prevBlocks =>
+        prevBlocks.map(b =>
+          b.id === block.id
+            ? { ...b, responses: [...b.responses, { role: 'user' as const, content: message }] }
             : b
         )
       )
@@ -90,6 +91,7 @@ export default function ChatBlock({ block, setBlocks, onMessageComplete }: ChatB
         },
         body: JSON.stringify({
           messages: conversationHistory,
+          blocks
         }),
       })
 
@@ -104,10 +106,10 @@ export default function ChatBlock({ block, setBlocks, onMessageComplete }: ChatB
       const decoder = new TextDecoder()
       let accumulatedResponse = ''
 
-      setBlocks(prevBlocks => 
-        prevBlocks.map(b => 
-          b.id === block.id 
-            ? {...b, responses: [...b.responses.slice(0, -1), { role: 'assistant', content: '', isTable: isTableRequest }]} 
+      setBlocks(prevBlocks =>
+        prevBlocks.map(b =>
+          b.id === block.id
+            ? { ...b, responses: [...b.responses.slice(0, -1), { role: 'assistant', content: '', isTable: isTableRequest }] }
             : b
         )
       )
@@ -119,21 +121,21 @@ export default function ChatBlock({ block, setBlocks, onMessageComplete }: ChatB
           break;
         }
         accumulatedResponse += decoder.decode(value)
-        
-        setBlocks(prevBlocks => 
-          prevBlocks.map(b => 
-            b.id === block.id 
+
+        setBlocks(prevBlocks =>
+          prevBlocks.map(b =>
+            b.id === block.id
               ? {
-                  ...b, 
-                  responses: [
-                    ...b.responses.slice(0, -1), 
-                    { 
-                      role: 'assistant', 
-                      content: accumulatedResponse,
-                      isTable: isTableRequest
-                    }
-                  ]
-                } 
+                ...b,
+                responses: [
+                  ...b.responses.slice(0, -1),
+                  {
+                    role: 'assistant',
+                    content: accumulatedResponse,
+                    isTable: isTableRequest
+                  }
+                ]
+              }
               : b
           )
         )
@@ -144,10 +146,10 @@ export default function ChatBlock({ block, setBlocks, onMessageComplete }: ChatB
       const generatedTitle = generateTitle(accumulatedResponse)
       setBlockTitle(generatedTitle)
 
-      setBlocks(prevBlocks => 
-        prevBlocks.map(b => 
-          b.id === block.id 
-            ? {...b, title: generatedTitle} 
+      setBlocks(prevBlocks =>
+        prevBlocks.map(b =>
+          b.id === block.id
+            ? { ...b, title: generatedTitle }
             : b
         )
       )
@@ -170,10 +172,10 @@ export default function ChatBlock({ block, setBlocks, onMessageComplete }: ChatB
       onMessageComplete()
     } catch (error) {
       console.error('Error:', error)
-      setBlocks(prevBlocks => 
-        prevBlocks.map(b => 
-          b.id === block.id 
-            ? {...b, responses: [...b.responses, { role: 'assistant', content: 'Error: Failed to get response' }]} 
+      setBlocks(prevBlocks =>
+        prevBlocks.map(b =>
+          b.id === block.id
+            ? { ...b, responses: [...b.responses, { role: 'assistant', content: 'Error: Failed to get response' }] }
             : b
         )
       )
@@ -198,12 +200,12 @@ export default function ChatBlock({ block, setBlocks, onMessageComplete }: ChatB
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault()
     const data = JSON.parse(e.dataTransfer.getData('text/plain'))
-    
+
     if (data.originalBlockId !== block.id) {
-      setBlocks(prevBlocks => 
-        prevBlocks.map(b => 
-          b.id === block.id 
-            ? {...b, responses: [...b.responses, { role: data.role, content: data.content }]} 
+      setBlocks(prevBlocks =>
+        prevBlocks.map(b =>
+          b.id === block.id
+            ? { ...b, responses: [...b.responses, { role: data.role, content: data.content }] }
             : b
         )
       )
@@ -228,11 +230,11 @@ export default function ChatBlock({ block, setBlocks, onMessageComplete }: ChatB
       prevBlocks.map(b =>
         b.id === block.id
           ? {
-              ...b,
-              responses: b.responses.map((r, i) =>
-                i === index ? { ...r, content: newContent } : r
-              )
-            }
+            ...b,
+            responses: b.responses.map((r, i) =>
+              i === index ? { ...r, content: newContent } : r
+            )
+          }
           : b
       )
     )
@@ -245,7 +247,7 @@ export default function ChatBlock({ block, setBlocks, onMessageComplete }: ChatB
 
   return (
     <Draggable
-      position={{x: block.x, y: block.y}}
+      position={{ x: block.x, y: block.y }}
       onDrag={handleDrag}
       bounds="parent"
       handle=".drag-handle"
@@ -257,10 +259,10 @@ export default function ChatBlock({ block, setBlocks, onMessageComplete }: ChatB
         minConstraints={[200, 200]}
         maxConstraints={[800, 600]}
       >
-        <div 
+        <div
           className="absolute bg-[#fbfaee] shadow-2xl rounded-2xl p-4 border border-[#53118f] border-opacity-20 overflow-hidden flex flex-col"
-          style={{ 
-            width: size.width, 
+          style={{
+            width: size.width,
             height: size.height,
             transform: 'translate(0, 0)',
             backdropFilter: 'blur(10px)',
@@ -271,7 +273,7 @@ export default function ChatBlock({ block, setBlocks, onMessageComplete }: ChatB
           <div className="drag-handle absolute top-0 left-0 right-0 h-8 bg-[#6e2daa] bg-opacity-50 cursor-move flex items-center px-4 rounded-t-2xl">
             <span className="text-sm font-medium text-[#fbfaee] truncate">{blockTitle}</span>
           </div>
-          <button 
+          <button
             onClick={handleDelete}
             className="absolute top-2 right-2 text-[#53118f] hover:text-[#933dc9] transition-colors duration-200"
           >
@@ -281,11 +283,10 @@ export default function ChatBlock({ block, setBlocks, onMessageComplete }: ChatB
           </button>
           <div className="flex-grow overflow-y-auto mt-10 px-2 scrollbar-thin scrollbar-thumb-[#6e2daa] scrollbar-track-[#53118f]">
             {block.responses.map((response, index) => (
-              <div 
-                key={index} 
-                className={`mb-4 text-sm ${
-                  response.role === 'assistant' ? 'text-[#53118f]' : 'hidden'
-                } w-full`}
+              <div
+                key={index}
+                className={`mb-4 text-sm ${response.role === 'assistant' ? 'text-[#53118f]' : 'hidden'
+                  } w-full`}
                 draggable
                 onDragStart={(e) => handleDragStart(e, response, index)}
               >
@@ -335,11 +336,10 @@ export default function ChatBlock({ block, setBlocks, onMessageComplete }: ChatB
                   placeholder="Type a message..."
                   disabled={isLoading}
                 />
-                <button 
+                <button
                   onClick={handleSend}
-                  className={`absolute right-2 top-1/2 transform -translate-y-1/2 bg-[#933dc9] text-[#fbfaee] p-2 rounded-full transition-colors duration-200 ${
-                    isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#53118f]'
-                  }`}
+                  className={`absolute right-2 top-1/2 transform -translate-y-1/2 bg-[#933dc9] text-[#fbfaee] p-2 rounded-full transition-colors duration-200 ${isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#53118f]'
+                    }`}
                   disabled={isLoading}
                 >
                   {isLoading ? (

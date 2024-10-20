@@ -1,5 +1,6 @@
 'use client'
 
+import { useWalletClient } from "wagmi";
 import { useState, useCallback, useEffect } from 'react'
 import ChatBlock from '../components/ChatBlock'
 import Canvas from '../components/Canvas'
@@ -8,29 +9,29 @@ import { PinataSDK } from 'pinata'
 import { useParams } from 'next/navigation'
 
 const pinata = new PinataSDK({
-    pinataJwt: `${process.env.PINATA_JWT}`, 
-    pinataGateway: "beige-fashionable-kangaroo-471.mypinata.cloud"
+  pinataJwt: `${process.env.PINATA_JWT}`,
+  pinataGateway: "beige-fashionable-kangaroo-471.mypinata.cloud"
 })
 
 interface Block {
-    id: string;
-    x: number;
-    y: number;
-    responses: Response[];
-    title: string;
-  }
-  
+  id: string;
+  x: number;
+  y: number;
+  responses: Response[];
+  title: string;
+}
+
 interface Response {
-role: 'user' | 'assistant';
-content: string;
-isTable?: boolean;
+  role: 'user' | 'assistant';
+  content: string;
+  isTable?: boolean;
 }
 
 interface Book {
-    id: string;
-    name: string;
-    cid: string;
-  }
+  id: string;
+  name: string;
+  cid: string;
+}
 
 export default function Home() {
   const [blocks, setBlocks] = useState<Block[]>([])
@@ -55,13 +56,13 @@ export default function Home() {
     } catch (error) {
       console.error('Error fetching book:', error)
       // If the book doesn't exist, create a new one
-    //   const newBook: Book = {
-    //     id: bookId as string,
-    //     name: 'Untitled Book',
-    //     blocks: []
-    //   }
-    //   setBook(newBook)
-    //   await saveBook(newBook)
+      //   const newBook: Book = {
+      //     id: bookId as string,
+      //     name: 'Untitled Book',
+      //     blocks: []
+      //   }
+      //   setBook(newBook)
+      //   await saveBook(newBook)
     }
   }
 
@@ -82,7 +83,7 @@ export default function Home() {
     e.preventDefault()
     const data = JSON.parse(e.dataTransfer.getData('text/plain'))
     const { content, role, originalBlockId, originalIndex } = data
-    
+
     // Create a new block
     const newBlock: Block = {
       id: Date.now().toString(),
@@ -94,8 +95,8 @@ export default function Home() {
     setBlocks(prevBlocks => [...prevBlocks, newBlock])
 
     // Remove the message from the original block
-    setBlocks(prevBlocks => 
-      prevBlocks.map(block => 
+    setBlocks(prevBlocks =>
+      prevBlocks.map(block =>
         block.id === originalBlockId
           ? { ...block, responses: block.responses.filter((_, index) => index !== originalIndex) }
           : block
@@ -136,14 +137,15 @@ export default function Home() {
   }, [addNewBlock]);
 
   return (
-    <main 
+    <main
       className="h-screen w-screen relative overflow-hidden"
       onDrop={handleDrop}
       onDragOver={handleDragOver}
     >
       <Canvas onDoubleClick={handleDoubleClick}>
         {blocks.map(block => (
-          <ChatBlock 
+          <ChatBlock
+            blocks={blocks}
             key={block.id}
             block={block}
             setBlocks={setBlocks}
