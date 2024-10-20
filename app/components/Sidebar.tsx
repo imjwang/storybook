@@ -33,7 +33,7 @@ type UserData = {
 const mockData: UserData[] = [
   {
     author: '0x1234567890123456789012345678901234567890',
-    text: 'This is a sample text for the first mock data.',
+    text: 'A study on the history of the Pacific Northwest.',
     wallet: BigInt('1000000000000000000'),
     licenseTermsId: BigInt('5'),
     price: 1.01,
@@ -41,7 +41,7 @@ const mockData: UserData[] = [
   },
   {
     author: '0x2345678901234567890123456789012345678901',
-    text: 'Here is the second mock data entry.',
+    text: 'Blog post explaining the health benefits of hiking.',
     wallet: BigInt('2000000000000000000'),
     price: 0.00003,
     licenseTermsId: BigInt('2'),
@@ -49,7 +49,7 @@ const mockData: UserData[] = [
   },
   {
     author: '0x3456789012345678901234567890123456789012',
-    text: 'Third mock data for testing purposes.',
+    text: 'Doodles of poodles.',
     wallet: BigInt('3000000000000000000'),
     price: 0.02,
     licenseTermsId: BigInt('3'),
@@ -57,7 +57,7 @@ const mockData: UserData[] = [
   },
   {
     author: '0x4567890123456789012345678901234567890123',
-    text: 'Fourth and final mock data entry.',
+    text: 'Painting of a cat.',
     wallet: BigInt('4000000000000000000'),
     price: 0.01,
     licenseTermsId: BigInt('4'),
