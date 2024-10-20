@@ -79,12 +79,32 @@ try {
     model: "gpt-4o-mini",
     messages: [
       { role: "system", content: `You are an expert at extracting evidence from documents. The evidence should support the following topics.\Topics:\n${extractedAims}` },
-      { role: "user", content: `Generate a short paragraph of evidence supporting the topics. If the evidence is not precise, DO NOT INCLUDE! Documents:\n${formattedResultsArray.join("\n")} Please only extract meaningful numbers to back up any ideas given.` }
+      { role: "user", content: `Generate a short paragraph of evidence supporting the topics. INCLUDE AS MANY NUMBERS AS POSSIBLE! Documents:\n${formattedResultsArray.join("\n")} Please only extract meaningful numbers to back up any ideas given.` }
     ],
     stream: false
   })
+
+  const tangentRecThought = await openai.chat.completions.create({
+    model: "gpt-4o-mini",
+    messages: [
+      { role: "system", content: `You are a terse thinker. You are given a topic and you are to reduce it to one brilliant thought. Think deeply about this.` },
+      { role: "user", content: `Consider the following insight and reduce to one brilliant thought.\nInsight:\n${tangentRec.choices[0]?.message?.content}` }
+    ],
+    stream: false
+  })
+
+  const evidenceExtractionShortThought = await openai.chat.completions.create({
+    model: "gpt-4o-mini",
+    messages: [
+      { role: "system", content: `You are a terse analyst that reduces texts to one sentence. The sentence should contain facts backed by numbers and sources.` },
+      { role: "user", content: `Consider the following insight and reduce to one brilliant thought.\nInsight:\n${evidenceExtraction.choices[0]?.message?.content}` }
+    ],
+    stream: false
+  })
+
   
-  return NextResponse.json({ success: true, evidenceExtraction: evidenceExtraction.choices[0]?.message?.content, tangentRec: tangentRec.choices[0]?.message?.content });
+
+  return NextResponse.json({ success: true, evidenceExtraction: evidenceExtractionShortThought.choices[0]?.message?.content, tangentRec: tangentRecThought.choices[0]?.message?.content });
   
   } catch (error) {
     console.error('Error processing blocks:', error);
