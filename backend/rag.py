@@ -198,7 +198,7 @@ def llm_call(history, api_key:str):
   answer = response.json()["choices"][0]["message"]["content"]
   return answer
 
-def agent_call(llm_input, query, context, query_name, context_name):
+def agent_call(llm_input, query, context):
     input = query + "\n" + context 
     user_input = {"role": "user", "content": input}
     llm_input.append(user_input)

@@ -27,6 +27,13 @@ def test_query(query_text, n_results=2, use_cache=False):
     print(f"Query: '{query_text}'")
     print("Response:", json.dumps(response.json(), indent=2))
 
+
+def test_get_markdown(query_text):
+    url = f"{BASE_URL}/get-markdown?input_text={query_text}"
+    response = requests.get(url)
+    print(f"Query: '{query_text}'")
+    print("Response:", json.dumps(response.json(), indent=2))
+
 def test_collection_info():
     url = f"{BASE_URL}/collection_info/"
     response = requests.get(url)
@@ -37,25 +44,16 @@ if __name__ == "__main__":
     test_add_texts()
 
     # Test getting collection info
-    test_collection_info()
+    # test_collection_info()
 
     # Test querying
     print("\nTesting queries:")
     # test_query("programming languages", use_cache = False)
     # test_query("artificial intelligence", use_cache = False)
     # test_query("database systems", use_cache = False)
-    test_query("programming languages")
-    test_query("artificial intelligence")
-    test_query("database systems")
-    
-    # # Test cache hit
-    # print("\nTesting cache hit:")
     # test_query("programming languages")
-    
-    # # Test without cache
-    # print("\nTesting without cache:")
-    # test_query("programming languages", use_cache=False)
+    # test_query("artificial intelligence")
+    # test_query("database systems")
 
-    # # Test with more results
-    # print("\nTesting with more results:")
-    # test_query("information technology", n_results=3)
+
+    test_get_markdown("The session explored potential blockchain applications across various industries. Participants brainstormed use cases leveraging blockchain's key features: decentralization, transparency, and immutability. Ideas ranged from supply chain tracking to decentralized finance solutions. The group discussed technical challenges, scalability concerns, and regulatory considerations. They prioritized ideas based on feasibility and potential impact. Action items included further research on top concepts and identifying potential partners for pilot projects.")
