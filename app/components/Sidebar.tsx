@@ -69,8 +69,24 @@ export default function Sidebar({ blocks, shouldUpdateInsight }: SidebarProps) {
   const { mintAndRegisterNFT, registerLicense, collectRoyalty, mintLicense } = useStory();
   const { data: wallet, isLoading } = useWalletClient();
 
+  const [supportingEvidence, setSupportingEvidence] = useState<string>('');
+  const [tangentRec, setTangentRec] = useState<string>('');
+
   const [insight, setInsight] = useState<string>('');
   const uri = "https://google.com"
+
+  const handleInsights = async () => {
+    const res = await fetch('/api/search', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ blocks }),
+    })
+    const { evidenceExtraction, tangentRec } = await res.json()
+    setSupportingEvidence(evidenceExtraction)
+    setTangentRec(tangentRec)
+  }
   const handlePublish = async () => {
     const ipId = await mintAndRegisterNFT(wallet?.account.address as Address, uri) // uri should come from the browser index
     console.log("ipId", ipId)
@@ -123,6 +139,17 @@ export default function Sidebar({ blocks, shouldUpdateInsight }: SidebarProps) {
       >
         Publish
       </Button>
+      <Button onClick={handleInsights}>
+        Insights
+      </Button>
+      <h3 className="text-xl font-bold text-[#53118f] tracking-tight">supporting evidence</h3>
+      <p>
+        {supportingEvidence}
+      </p>
+      <h3 className="text-xl font-bold text-[#53118f] tracking-tight">tangent recommendations</h3>
+      <p>
+        {tangentRec}
+      </p>
       {/* <div className="bg-[#6e2daa] bg-opacity-10 rounded-xl p-5 shadow-inner">
         <p className="text-sm text-[#53118f] leading-relaxed font-light">{insight}</p>
       </div> */}
@@ -138,9 +165,6 @@ export default function Sidebar({ blocks, shouldUpdateInsight }: SidebarProps) {
                   className="bg-[#6e2daa] hover:bg-[#933dc9] w-16 text-[#fbfaee] font-medium transition duration-300 ease-in-out shadow-lg hover:shadow-xl transform hover:-translate-y-1 active:translate-y-0 active:shadow-md"
                 >
                   Connect
-                </Button>
-                <Button onClick={() => collectRoyalty("0x69A6D217764D4C2F1F10c347202521337c5619A4", wallet?.account.address as Address)}>
-                  Test
                 </Button>
               </div>
             </div>
