@@ -1,5 +1,6 @@
 import os
 import pickle
+import json
 from typing import List, Optional
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
@@ -33,6 +34,33 @@ load_dotenv()
 app = FastAPI()
 
 pinata_client = PinataClient()
+
+CACHE_FILE = "ipfs_hash_cache.json"
+
+
+def save_ipfs_hash_locally(ipfs_hash: str, data: dict) -> None:
+    """Save IPFS hash and related metadata to a JSON file."""
+    try:
+        # Load existing cache if it exists
+        if os.path.exists(CACHE_FILE):
+            with open(CACHE_FILE, "r") as f:
+                cache = json.load(f)
+        else:
+            cache = {}
+        cache[ipfs_hash] = data
+        with open(CACHE_FILE, "w") as f:
+            json.dump(cache, f)
+    except Exception as e:
+        print(f"Error saving IPFS hash locally: {str(e)}")
+
+
+def get_data_from_ipfs_hash(ipfs_hash: str) -> Optional[dict]:
+    """Retrieve data based on IPFS hash from the local JSON file."""
+    if os.path.exists(CACHE_FILE):
+        with open(CACHE_FILE, "r") as f:
+            cache = json.load(f)
+        return cache.get(ipfs_hash, None)
+    return None
 
 class SemanticCache:
     def __init__(
@@ -88,7 +116,7 @@ class QueryItem(BaseModel):
     query: str
     n_results: int = 2
     use_cache: bool = True
-    store_in_pinata: Optional[bool] = False
+    store_in_pinata: Optional[bool] = True
 
 
 model = SentenceTransformer("Snowflake/snowflake-arctic-embed-xs")
@@ -108,7 +136,7 @@ async def startup_event():
 
 
 @app.post("/add_texts/")
-async def add_texts(texts: List[TextItem], store_in_pinata: Optional[bool] = False):
+async def add_texts(texts: List[TextItem], store_in_pinata: Optional[bool] = True):
     documents = [item.text for item in texts]
     metadata = [item.metadata for item in texts]
     embeddings = model.encode(documents).tolist()
@@ -129,11 +157,15 @@ async def add_texts(texts: List[TextItem], store_in_pinata: Optional[bool] = Fal
                 "metadata": metadata,
                 "embeddings": embeddings
             }
+            # Upload to Pinata
             response = pinata_client.upload_json(json_data)
             if response:
+                # Cache IPFS Hash locally after successful upload
+                ipfs_hash = response.get("IpfsHash")
+                save_ipfs_hash_locally(ipfs_hash, json_data)
                 return {
                     "message": f"Added {len(documents)} documents to the collection and stored in Pinata.",
-                    "pinata_ipfs_hash": response.get("IpfsHash"),
+                    "pinata_ipfs_hash": ipfs_hash,
                 }
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Failed to upload to Pinata: {str(e)}")
@@ -150,24 +182,27 @@ async def perform_query(query_item: QueryItem):
     results = collection.query(
         query_texts=[query_item.query], n_results=query_item.n_results
     )
+    
     if query_item.store_in_pinata:
         try:
             json_data = {
                 "query": query_item.query,
                 "result": results
             }
+            # Upload to Pinata
             response = pinata_client.upload_json(json_data)
             if response:
+                ipfs_hash = response.get("IpfsHash")
+                save_ipfs_hash_locally(ipfs_hash, json_data)
                 return {
                     "result": results,
                     "source": "database",
-                    "pinata_ipfs_hash": response.get("IpfsHash"),
+                    "pinata_ipfs_hash": ipfs_hash,
                 }
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Failed to upload to Pinata: {str(e)}")
     if query_item.use_cache:
         cache.add(query_item.query, results)
-
     return {"result": results, "source": "database"}
 
 
@@ -193,11 +228,10 @@ sys_message = [{"role": "system", "content": sys_prompt}]
 
 # Route for markdown text generation
 @app.get("/get-markdown", response_model=MarkdownResponse)
-async def get_markdown(input_text: str, store_in_pinata: Optional[bool] = False):
+async def get_markdown(input_text: str, store_in_pinata: Optional[bool] = True):
     query = agent_call(
         create_query_prompt_message, input_text, "CONTENT: " + input_text
     )
-    # Simulate markdown text generation from the input text
     response = tavily_search(query)
     content = get_content_from_tavily_search(response, input_text)
     markdown_text = (
@@ -213,9 +247,19 @@ async def get_markdown(input_text: str, store_in_pinata: Optional[bool] = False)
                 "markdown_text": markdown_text,
                 "reference_links": get_links_from_tavily_search(response),
             }
-            pinata_response = pinata_client.upload_json(json_data)
-            if pinata_response:
-                pinata_ipfs_hash = pinata_response.get("IpfsHash")
+            cached_data = get_data_from_ipfs_hash(input_text)
+            if cached_data:
+                url = f"http://localhost:8000/get-markdown-from-pinata/{pinata_ipfs_hash}"
+                response = requests.get(url)
+                if response.status_code == 200:
+                    return response.json()
+                else:
+                    raise HTTPException(
+                        status_code=response.status_code,
+                        detail=f"Failed to retrieve from Pinata via internal route. Error: {response.text}"
+                    )
+            else:
+                raise HTTPException(status_code=500, detail="Failed to upload to Pinata.")
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Failed to upload to Pinata: {str(e)}")
     return MarkdownResponse(
@@ -224,8 +268,8 @@ async def get_markdown(input_text: str, store_in_pinata: Optional[bool] = False)
         reference_links=get_links_from_tavily_search(response),
     )
     
-@app.get("/retrieve-markdown-from-pinata/{ipfs_hash}", response_model=MarkdownResponse)
-async def retrieve_markdown_from_pinata(ipfs_hash: str):
+@app.get("/get-markdown-from-pinata/{ipfs_hash}", response_model=MarkdownResponse)
+async def get_markdown_from_pinata(ipfs_hash: str):
     try:
         data = pinata_client.retrieve_json(ipfs_hash)
         if data:
@@ -233,12 +277,18 @@ async def retrieve_markdown_from_pinata(ipfs_hash: str):
             return MarkdownResponse(
                 query=content.get("query", ""),
                 markdown_text=content.get("markdown_text", ""),
-                reference_links=content.get("reference_links", []),
+                pinata_ipfs_hash=ipfs_hash,
+            )        
+        cached_data = get_data_from_ipfs_hash(ipfs_hash)
+        if cached_data:
+            return MarkdownResponse(
+                query=cached_data.get("query", ""),
+                markdown_text=cached_data.get("markdown_text", ""),
                 pinata_ipfs_hash=ipfs_hash,
             )
-        raise HTTPException(status_code=404, detail="Data not found on Pinata.")
+        raise HTTPException(status_code=404, detail="Data not found on Pinata or in local cache.")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to retrieve from Pinata: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to retrieve from Pinata or local cache: {str(e)}")
 
 
 if __name__ == "__main__":
