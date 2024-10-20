@@ -22,12 +22,19 @@ interface Book {
 }
 
 export default function Home() {
-  const { mintAndRegisterNFT, registerLicense, mintLicense, ipId, termsId } = useStory();
+  const { mintAndRegisterNFT, registerLicense, mintLicense } = useStory();
   const { data: wallet, isLoading } = useWalletClient();
   const router = useRouter();
 
-  const ipIpfsHash = "QmRANDOMHASH123456789abcdefghijklmnopqrstuvwxyz"
-  const uri = `https://ipfs.io/ipfs/${ipIpfsHash}`
+  const handlePublish = async () => {
+    const ipId = await mintAndRegisterNFT(wallet?.account.address as Address, uri) // uri should come from the browser index
+    const res = await registerLicense(ipId as `0x${string}`)
+    return res?.licenseTermsId // use to create a json
+  }
+
+  const uri = "1" // this needs to be id of note
+  // const ipIpfsHash = "QmRANDOMHASH123456789abcdefghijklmnopqrstuvwxyz"
+  // const uri = `https://ipfs.io/ipfs/${ipIpfsHash}`
 
   return (
     <div className="min-h-screen bg-white">
@@ -44,24 +51,25 @@ export default function Home() {
               Welcome, {wallet.account.address.slice(0, 6)}...{wallet.account.address.slice(-4)}
             </p>
             <div className="grid grid-cols-2 gap-6 mb-12">
-              <Button 
-                onClick={() => mintAndRegisterNFT(wallet?.account.address as Address, uri)}
+              {/* This needs to move to the book */}
+              <Button
+                onClick={handlePublish}
                 className="bg-gray-900 hover:bg-gray-800 text-white font-light py-3 px-6 rounded-md transition duration-300 ease-in-out"
               >
-                Mint Token
+                Publish
               </Button>
-              <Button 
+              {/* <Button
                 onClick={() => registerLicense(ipId as `0x${string}`)}
                 className="bg-gray-900 hover:bg-gray-800 text-white font-light py-3 px-6 rounded-md transition duration-300 ease-in-out"
               >
                 Register PIL
-              </Button>
-              <Button 
-                onClick={() => mintLicense(ipId as `0x${string}`, termsId as bigint)}
+              </Button> */}
+              {/* <Button
+                onClick={() => handleMintAndLicense()}
                 className="col-span-2 bg-gray-900 hover:bg-gray-800 text-white font-light py-3 px-6 rounded-md transition duration-300 ease-in-out"
               >
                 Mint License
-              </Button>
+              </Button> */}
             </div>
             {isLoading ? (
               <p className="text-center text-gray-500">Loading books...</p>

@@ -8,9 +8,6 @@ import { defaultNftContractAbi } from "@/lib/defaultNftContractAbi";
 import { useState, useEffect } from "react";
 
 export default function useStory() {
-  const [ipId, setIpId] = useState<`0x${string}` | undefined>(undefined)
-  const [termsId, setTermsId] = useState<bigint | undefined>(undefined)
-
   const { data: wallet } = useWalletClient();
   const [client, setClient] = useState<StoryClient | undefined>(undefined)
 
@@ -68,22 +65,21 @@ export default function useStory() {
       txOptions: { waitForTransaction: true }
     });
     console.log(`Root IPA created at tx hash ${response.txHash}, IPA ID: ${response.ipId}`);
-    setIpId(response.ipId);
+    return response.ipId
   };
 
   const registerLicense = async (ipId: `0x${string}`) => {
     if (!client) return;
     if (!ipId) return;
-    const response = await client.license.registerCommercialUsePIL({
+    const { licenseTermsId } = await client.license.registerCommercialUsePIL({
       currency: '0x91f6F05B08c16769d3c85867548615d270C42fC7', // see the above note on whitelisted revenue tokens
       defaultMintingFee: '0', // 10 of the currency (using the above currency, 10 MERC20)    
       txOptions: { waitForTransaction: true }
     })
-    console.log(`PIL Terms registered at transaction hash ${response.txHash}, License Terms ID: ${response.licenseTermsId}`)
+    if (!licenseTermsId) return;
 
-    setTermsId(response.licenseTermsId)
     const response2 = await client.license.attachLicenseTerms({
-      licenseTermsId: response.licenseTermsId as bigint,
+      licenseTermsId,
       ipId,
       txOptions: { waitForTransaction: true }
     });
@@ -94,6 +90,7 @@ export default function useStory() {
     } else {
       console.log(`License Terms already attached to this IPA.`)
     }
+    return { licenseTermsId, ipId }
   }
 
   const mintLicense = async (ipId: `0x${string}`, termsId: bigint) => {
@@ -104,7 +101,7 @@ export default function useStory() {
       licenseTermsId: termsId,
       licensorIpId: ipId,
       receiver: wallet?.account.address as Address,
-      amount: 100,
+      amount: 1,
       txOptions: { waitForTransaction: true }
     });
     console.log(response)
@@ -114,8 +111,6 @@ export default function useStory() {
     mintAndRegisterNFT,
     registerLicense,
     mintLicense,
-    ipId,
-    termsId,
   }
 
 }
