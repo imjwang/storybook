@@ -36,12 +36,12 @@ export async function POST(req: NextRequest) {
   });
   }
   // Map blocks to a string format
-  const mappedBlocks = blocks.map(block => {
+  const mappedBlocks = blocks.map((block: any) => {
 if (block.responses.length < 1) return ''
 return `Title:
 ${block.title}
 Content:
-${block.responses.map(response => response.content).join('\n')}
+${block.responses.map((response: any) => response.content).join('\n')}
   `}).join('\n');
 
     const sysPrompt = "You are given a set of Documents. You are an assistant the infers higher level interests based on provided documents. Assume that the user is already interested in all the Documents."
