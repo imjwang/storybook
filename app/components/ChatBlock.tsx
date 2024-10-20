@@ -258,32 +258,33 @@ export default function ChatBlock({ block, setBlocks, onMessageComplete }: ChatB
         maxConstraints={[800, 600]}
       >
         <div 
-          className="absolute bg-white shadow-2xl rounded-lg p-2 border border-gray-200 overflow-hidden flex flex-col"
+          className="absolute bg-[#fbfaee] shadow-2xl rounded-2xl p-4 border border-[#53118f] border-opacity-20 overflow-hidden flex flex-col"
           style={{ 
             width: size.width, 
             height: size.height,
-            transform: 'translate(0, 0)'
+            transform: 'translate(0, 0)',
+            backdropFilter: 'blur(10px)',
           }}
           onDrop={handleDrop}
           onDragOver={(e) => e.preventDefault()}
         >
-          <div className="drag-handle absolute top-0 left-0 right-0 h-6 bg-gray-100 cursor-move flex items-center px-2">
-            <span className="text-sm font-medium text-gray-700 truncate">{blockTitle}</span>
+          <div className="drag-handle absolute top-0 left-0 right-0 h-8 bg-[#6e2daa] bg-opacity-50 cursor-move flex items-center px-4 rounded-t-2xl">
+            <span className="text-sm font-medium text-[#fbfaee] truncate">{blockTitle}</span>
           </div>
           <button 
             onClick={handleDelete}
-            className="absolute top-1 right-1 text-gray-400 hover:text-red-500 transition-colors duration-200"
+            className="absolute top-2 right-2 text-[#53118f] hover:text-[#933dc9] transition-colors duration-200"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
             </svg>
           </button>
-          <div className="flex-grow overflow-y-auto mt-8 px-2">
+          <div className="flex-grow overflow-y-auto mt-10 px-2 scrollbar-thin scrollbar-thumb-[#6e2daa] scrollbar-track-[#53118f]">
             {block.responses.map((response, index) => (
               <div 
                 key={index} 
-                className={`mb-3 text-sm ${
-                  response.role === 'assistant' ? 'text-gray-800' : 'hidden'
+                className={`mb-4 text-sm ${
+                  response.role === 'assistant' ? 'text-[#53118f]' : 'hidden'
                 } w-full`}
                 draggable
                 onDragStart={(e) => handleDragStart(e, response, index)}
@@ -297,7 +298,7 @@ export default function ChatBlock({ block, setBlocks, onMessageComplete }: ChatB
                         value={response.content}
                         onChange={(e) => handleResponseEdit(index, e.target.value)}
                         onBlur={() => setIsEditing(null)}
-                        className="w-full min-h-[100px] bg-transparent resize-vertical focus:outline-none border border-gray-300 p-2"
+                        className="w-full min-h-[100px] bg-[#6e2daa] bg-opacity-10 resize-vertical focus:outline-none border border-[#53118f] border-opacity-30 p-3 rounded-lg text-[#53118f]"
                         autoFocus
                         style={{ height: 'auto', overflow: 'hidden' }}
                         onInput={(e) => {
@@ -306,12 +307,12 @@ export default function ChatBlock({ block, setBlocks, onMessageComplete }: ChatB
                         }}
                       />
                     ) : (
-                      <div onClick={() => setIsEditing(index)}>
-                        <ReactMarkdown>{response.content}</ReactMarkdown>
+                      <div onClick={() => setIsEditing(index)} className="cursor-pointer hover:bg-[#6e2daa] hover:bg-opacity-10 rounded-lg p-2 transition-all duration-200">
+                        <ReactMarkdown className="prose prose-purple">{response.content}</ReactMarkdown>
                       </div>
                     )
                   ) : (
-                    <p className="whitespace-pre-wrap">{response.content}</p>
+                    <p className="whitespace-pre-wrap text-[#53118f]">{response.content}</p>
                   )
                 )}
               </div>
@@ -319,7 +320,7 @@ export default function ChatBlock({ block, setBlocks, onMessageComplete }: ChatB
             <div ref={messagesEndRef} />
           </div>
           {!hasUserSentMessage && (
-            <div className="mt-2">
+            <div className="mt-4">
               <div className="relative">
                 <input
                   type="text"
@@ -330,19 +331,19 @@ export default function ChatBlock({ block, setBlocks, onMessageComplete }: ChatB
                       handleSend();
                     }
                   }}
-                  className="w-full border border-gray-300 rounded-full py-2 pl-4 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full bg-[#6e2daa] bg-opacity-10 border border-[#53118f] border-opacity-30 rounded-full py-2 pl-4 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-[#933dc9] focus:border-transparent text-[#53118f] placeholder-[#53118f] placeholder-opacity-50"
                   placeholder="Type a message..."
                   disabled={isLoading}
                 />
                 <button 
                   onClick={handleSend}
-                  className={`absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-500 text-white p-2 rounded-full transition-colors duration-200 ${
-                    isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600'
+                  className={`absolute right-2 top-1/2 transform -translate-y-1/2 bg-[#933dc9] text-[#fbfaee] p-2 rounded-full transition-colors duration-200 ${
+                    isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#53118f]'
                   }`}
                   disabled={isLoading}
                 >
                   {isLoading ? (
-                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <svg className="animate-spin h-5 w-5 text-[#fbfaee]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
@@ -383,26 +384,26 @@ function TableFromJSON({ jsonString }: { jsonString: string }) {
   return (
     <div className="relative">
       <div className="overflow-auto w-auto h-auto">
-        <table className="divide-y divide-gray-200 text-xs">
-          <thead className="bg-gray-50 sticky top-0">
+        <table className="divide-y divide-[#53118f] divide-opacity-20 text-xs">
+          <thead className="bg-[#6e2daa] bg-opacity-10 sticky top-0">
             <tr>
               {tableData.headers.map((header, index) => (
                 <th
                   key={index}
-                  className="px-2 py-1 text-left font-medium text-gray-500 uppercase tracking-wider"
+                  className="px-2 py-2 text-left font-medium text-[#53118f] uppercase tracking-wider"
                 >
                   {header}
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-[#53118f] bg-opacity-5 divide-y divide-[#53118f] divide-opacity-10">
             {tableData.rows.map((row, rowIndex) => (
               <tr key={rowIndex}>
                 {row.map((cell, cellIndex) => (
                   <td
                     key={cellIndex}
-                    className="px-2 py-1 whitespace-nowrap text-gray-500"
+                    className="px-2 py-2 whitespace-nowrap text-[#53118f]"
                   >
                     {cell}
                   </td>

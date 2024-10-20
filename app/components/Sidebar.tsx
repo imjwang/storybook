@@ -57,10 +57,13 @@ export default function Sidebar({ blocks, shouldUpdateInsight }: SidebarProps) {
   }, [getAllResponses, shouldUpdateInsight]);
 
   return (
-    <div className="fixed right-4 top-4 w-72 bg-white rounded-xl shadow-lg p-6 overflow-y-auto max-h-[calc(100vh-2rem)] backdrop-blur-sm bg-opacity-90">
-      <h2 className="text-2xl font-bold mb-4 text-indigo-600">book buddy</h2>
-      <div className="bg-indigo-50 rounded-lg p-4">
-        <p className="text-sm text-gray-700 leading-relaxed">{insight}</p>
+    <div className="fixed right-4 top-4 w-80 bg-[#fbfaee] rounded-2xl shadow-2xl p-6 overflow-y-auto max-h-[calc(100vh-2rem)] backdrop-filter backdrop-blur-lg border border-[#53118f] border-opacity-20">
+      <h2 className="text-3xl font-extrabold mb-6 text-[#53118f] tracking-tight">book buddy</h2>
+      <div className="bg-[#6e2daa] bg-opacity-10 rounded-xl p-5 shadow-inner">
+        <p className="text-sm text-[#53118f] leading-relaxed font-light">{insight}</p>
+      </div>
+      <div className="mt-6 flex justify-center">
+        <div className="w-12 h-1 bg-[#53118f] rounded-full opacity-30"></div>
       </div>
     </div>
   );

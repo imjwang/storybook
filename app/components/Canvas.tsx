@@ -10,14 +10,29 @@ interface CanvasProps {
 export default function Canvas({ children, onDoubleClick }: CanvasProps) {
   return (
     <div 
-      className="w-full h-full border border-gray-300 relative bg-gray-100 bg-opacity-50 flex flex-col" 
+      className="w-full h-full relative flex flex-col overflow-hidden"
       style={{
-        backgroundImage: 'radial-gradient(circle, #AAAAAA 1px, transparent 1px)',
-        backgroundSize: '30px 30px'
+        background: '#fbfaee',
+        boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)',
+        backdropFilter: 'blur(5px)',
       }}
       onDoubleClick={onDoubleClick}
     >
-      {children}
+      <div 
+        className="absolute inset-0"
+        style={{
+          backgroundImage: `
+            radial-gradient(circle, #3a0c64 2px, transparent 2px),
+            radial-gradient(circle, #4e1f7a 2px, transparent 2px)
+          `,
+          backgroundSize: '40px 40px, 90px 90px',
+          backgroundPosition: '0 0, 15px 15px',
+          opacity: 0.1,
+        }}
+      />
+      <div className="relative z-10 flex-grow">
+        {children}
+      </div>
     </div>
   )
 }
