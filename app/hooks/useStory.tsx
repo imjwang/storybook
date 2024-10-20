@@ -73,9 +73,10 @@ export default function useStory() {
     if (!ipId) return;
     const { licenseTermsId } = await client.license.registerCommercialUsePIL({
       currency: '0x91f6F05B08c16769d3c85867548615d270C42fC7', // see the above note on whitelisted revenue tokens
-      defaultMintingFee: '0', // 10 of the currency (using the above currency, 10 MERC20)    
+      defaultMintingFee: '1', // 10 of the currency (using the above currency, 10 MERC20)    
       txOptions: { waitForTransaction: true }
     })
+    console.log("licenseTermsId", licenseTermsId)
     if (!licenseTermsId) return;
 
     const response2 = await client.license.attachLicenseTerms({
@@ -107,10 +108,22 @@ export default function useStory() {
     console.log(response)
   }
 
+  const collectRoyalty = async (parentIpId: `0x${string}`, royaltyVaultIpId: `0x${string}`) => {
+    if (!client) return;
+    const response = await client.royalty.collectRoyaltyTokens({
+      parentIpId,
+      royaltyVaultIpId,
+      txOptions: { waitForTransaction: true }
+    });
+
+    console.log(`Collected royalty token ${response.royaltyTokensCollected} at transaction hash ${response.txHash}`)
+  }
+
   return {
     mintAndRegisterNFT,
     registerLicense,
     mintLicense,
+    collectRoyalty
   }
 
 }

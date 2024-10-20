@@ -37,51 +37,32 @@ export default function Home() {
   // const uri = `https://ipfs.io/ipfs/${ipIpfsHash}`
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#fbfaee]">
       <main className="container mx-auto px-4 py-16">
         <div className="flex justify-end mb-12">
           <ConnectButton />
         </div>
-        <h1 className="text-6xl font-light text-gray-900 mb-16 text-center tracking-tight">
-          storybook
+        <h1 className="text-6xl font-bold text-[#53118f] mb-16 text-center tracking-tight">
+          storybook.
         </h1>
         {wallet && (
-          <div className="max-w-3xl mx-auto">
-            <p className="text-lg text-gray-600 mb-12 text-center">
+          <div className="max-w-3xl mx-auto bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-xl p-8 shadow-2xl">
+            <p className="text-lg text-[#53118f] mb-12 text-center">
               Welcome, {wallet.account.address.slice(0, 6)}...{wallet.account.address.slice(-4)}
             </p>
             <div className="grid grid-cols-2 gap-6 mb-12">
-              {/* This needs to move to the book */}
-              <Button
-                onClick={handlePublish}
-                className="bg-gray-900 hover:bg-gray-800 text-white font-light py-3 px-6 rounded-md transition duration-300 ease-in-out"
-              >
-                Publish
-              </Button>
-              {/* <Button
-                onClick={() => registerLicense(ipId as `0x${string}`)}
-                className="bg-gray-900 hover:bg-gray-800 text-white font-light py-3 px-6 rounded-md transition duration-300 ease-in-out"
-              >
-                Register PIL
-              </Button> */}
-              {/* <Button
-                onClick={() => handleMintAndLicense()}
-                className="col-span-2 bg-gray-900 hover:bg-gray-800 text-white font-light py-3 px-6 rounded-md transition duration-300 ease-in-out"
-              >
-                Mint License
-              </Button> */}
             </div>
             {isLoading ? (
-              <p className="text-center text-gray-500">Loading books...</p>
+              <p className="text-center text-[#53118f]">Loading books...</p>
             ) : (
               <div className="flex justify-center">
                 <button className="group focus:outline-none" onClick={() => router.push('/create')}>
-                  <div className="w-56 h-56 bg-gray-50 flex items-center justify-center rounded-lg transition duration-300 ease-in-out group-hover:bg-gray-100">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-20 w-20 text-gray-400 group-hover:text-gray-500 transition duration-300 ease-in-out" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="w-56 h-56 bg-[#53118f] bg-opacity-10 flex items-center justify-center rounded-lg transition duration-300 ease-in-out group-hover:bg-opacity-20 shadow-lg hover:shadow-xl">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-20 w-20 text-[#53118f] group-hover:text-[#933dc9] transition duration-300 ease-in-out" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
                     </svg>
                   </div>
-                  <p className="mt-6 text-xl text-gray-700 font-light group-hover:text-gray-900 transition duration-300 ease-in-out">Create New Book</p>
+                  <p className="mt-6 text-xl text-[#53118f] font-light group-hover:text-[#933dc9] transition duration-300 ease-in-out">Create New Book</p>
                 </button>
               </div>
             )}
